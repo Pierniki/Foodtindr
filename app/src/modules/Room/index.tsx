@@ -1,7 +1,8 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import styled from 'styled-components';
+import WaitingRoom from '../WaitingRoom';
 
 interface RoomParams {
   id: string;
@@ -33,12 +34,12 @@ const RoomWrapper = () => {
     });
     socket.on('room:joined', (id: string) => {
       history.push(`/room/${id}`);
-      setIsWaiting(false);
     });
     socket.on('room:missing', () => {
       history.push('/');
     });
     socket.on('room:meals', (meal: any) => {
+      if (!isWaiting) setIsWaiting(false);
       console.log(meal);
       setMeal(meal);
     });
@@ -56,11 +57,7 @@ const RoomWrapper = () => {
   return <Room id={id} meal={meal} socket={socketCon.current} />;
 };
 
-const WaitingRoom = () => {
-  return <header className="App-header" />;
-};
-
-interface RoomProps {
+export interface RoomProps {
   id: string;
   meal?: Meal;
   socket: SocketIOClient.Socket;

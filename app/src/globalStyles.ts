@@ -16,6 +16,15 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+
+  textarea {
+    font-family: 'Ubuntu', sans-serif;
+  }
+
+  button {
+    font-family: 'Ubuntu', sans-serif;
+
+  }
 `;
 
 export default GlobalStyle;

@@ -1,38 +1,5 @@
 import styled from 'styled-components';
-
-interface ColorProps {
-  primary?: boolean;
-}
-
-interface RelativityProps {
-  top?: string;
-  left?: string;
-}
-
-interface CardTitleProps extends ColorProps, RelativityProps {}
-
-interface BackgroundElementProps extends ColorProps {
-  width: string;
-  height: string;
-  top?: string;
-}
-
-export const Background = styled.div`
-  z-index: -1;
-  position: relative;
-  top: -47px;
-  display: flex;
-  justify-content: center;
-`;
-
-export const BackgroundElement = styled.div<BackgroundElementProps>`
-  position: relative;
-  top: ${(props) => (props.top ? props.top : '0')};
-  width: ${(props) => props.width};
-  height: ${(props) => props.height};
-  background-color: ${(props) =>
-    props.primary ? 'var(--primary)' : 'var(--primary-dark)'};
-`;
+import { ColorProps, RelativityProps } from '../../types';
 
 export const Header = styled.header`
   display: flex;
@@ -41,21 +8,6 @@ export const Header = styled.header`
   justify-content: center;
   align-items: center;
   margin-bottom: 130px;
-`;
-
-export const Title = styled.h1`
-  color: var(--primary);
-  margin-top: 20px;
-
-  font-size: 100px;
-  font-weight: 900;
-  margin-bottom: 0;
-`;
-
-export const TitleAccent = styled.span`
-  background: linear-gradient(180deg, #d34444 59.37%, #181818 59.39%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 `;
 
 export const Subtitle = styled.h3`
@@ -103,6 +55,8 @@ export const Input = styled.input`
   font-weight: 700;
   padding: 10px 20px;
 `;
+
+interface CardTitleProps extends ColorProps, RelativityProps {}
 
 export const CardTitle = styled.h4<CardTitleProps>`
   text-align: left;

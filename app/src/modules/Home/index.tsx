@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
+import BackgroundElement from '../common/BackgroundElement';
 import {
-  Background,
-  BackgroundElement,
   Button,
   Card,
   CardDescription,
@@ -13,27 +12,12 @@ import {
   Main,
   Subtitle,
   SubtitleAccent,
-  Title,
-  TitleAccent,
 } from './styled';
-
-const BackgroundContainer = () => {
-  return (
-    <Background>
-      <BackgroundElement width={'290px'} height={'60px'} />
-      <BackgroundElement width={'290px'} height={'60px'} primary />
-    </Background>
-  );
-};
 
 const Home = () => {
   return (
     <>
       <Header>
-        <Title>
-          Food <TitleAccent>Tindr.</TitleAccent>
-        </Title>
-        <BackgroundContainer />
         <Subtitle>
           Your belly needs some <SubtitleAccent>lovin'</SubtitleAccent> too!
         </Subtitle>
