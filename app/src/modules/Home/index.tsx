@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BackgroundElement from '../common/BackgroundElement';
+import Button from '../common/Button';
 import {
-  Button,
   Card,
   CardDescription,
   CardTitle,
@@ -44,7 +44,9 @@ const CreateRoomCard = () => {
       </CardTitle>
       <CardDescription>Then send your friend a code.</CardDescription>
       <Link to={'/room/new'}>
-        <Button>New room.</Button>
+        <Button fontSize={'25px'} height={'55px'}>
+          New room.
+        </Button>
       </Link>
     </Card>
   );
@@ -60,6 +62,11 @@ const InputButton = () => {
   return (
     <InputButtonDiv>
       <Input value={id} onChange={onInputChange}></Input>
+      <Link to={`/room/${id}`}>
+        <Button fontSize={'30px'} primary>
+          {'>'}
+        </Button>
+      </Link>
     </InputButtonDiv>
   );
 };

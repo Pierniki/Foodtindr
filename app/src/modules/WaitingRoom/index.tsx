@@ -1,12 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { RoomIdParams } from '../../types';
-import {
-  Button,
-  CodeDisplay,
-  HelperText,
-  WaitingRoomContainer,
-} from './styled';
+import BackButton from '../common/BackButton';
+import Button from '../common/Button';
+import Container from '../common/Container';
+import { CodeDisplay, HelperText } from './styled';
 
 const CopyCode = () => {
   const codeRef = useRef<HTMLTextAreaElement>(null);
@@ -27,23 +25,21 @@ const CopyCode = () => {
   return (
     <>
       <CodeDisplay readOnly ref={codeRef} value={id}></CodeDisplay>
-      <Button onClick={copyToClipboard}>{copyText}</Button>
+      <Button onClick={copyToClipboard} fontSize={'25px'}>
+        {copyText}
+      </Button>
     </>
   );
 };
 
 const WaitingRoom = () => {
   return (
-    <WaitingRoomContainer>
+    <Container>
       <HelperText>Send that code to your friend.</HelperText>
       <CopyCode />
       <HelperText>or</HelperText>
-      <Link to={'/'}>
-        <Button primary width={'50%'}>
-          go back
-        </Button>
-      </Link>
-    </WaitingRoomContainer>
+      <BackButton />
+    </Container>
   );
 };
 

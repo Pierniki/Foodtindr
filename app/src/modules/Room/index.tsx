@@ -2,6 +2,11 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import styled from 'styled-components';
+import BackButton from '../common/BackButton';
+import BackgroundElement from '../common/BackgroundElement';
+import Button from '../common/Button';
+import Container from '../common/Container';
+import Text from '../common/Text';
 import WaitingRoom from '../WaitingRoom';
 
 interface RoomParams {
@@ -39,7 +44,7 @@ const RoomWrapper = () => {
       history.push('/');
     });
     socket.on('room:meals', (meal: any) => {
-      if (!isWaiting) setIsWaiting(false);
+      if (isWaiting) setIsWaiting(false);
       console.log(meal);
       setMeal(meal);
     });
@@ -64,12 +69,8 @@ export interface RoomProps {
 }
 
 const ThumbnailImage = styled.img`
-  max-width: 400px;
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
+  margin: 40px auto;
+  max-width: 500px;
 `;
 
 interface ImageWrapperProps {
@@ -92,6 +93,33 @@ const ImageWrapper: FC<ImageWrapperProps> = ({ thumbnail }) => {
   return <ThumbnailImage src={thumbnail} alt="thumbnail" />;
 };
 
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+interface VoteButtonProps {
+  voteFunction: (vote: boolean) => void;
+  isAffirmative: boolean;
+}
+
+const VoteButton: FC<VoteButtonProps> = ({ voteFunction, isAffirmative }) => {
+  return (
+    <div>
+      <Button
+        width={'150px'}
+        height={'150px'}
+        primary
+        onClick={() => voteFunction(isAffirmative)}
+      >
+        {isAffirmative ? 'Yes' : 'No'}
+      </Button>
+    </div>
+  );
+};
+
 const Room: FC<RoomProps> = ({ id, meal, socket }) => {
   const vote = (vote: boolean) => {
     socket.emit('room:vote', vote);
@@ -100,13 +128,20 @@ const Room: FC<RoomProps> = ({ id, meal, socket }) => {
   if (!meal) return null;
   return (
     <>
-      <h1>Room number {id}</h1>
-      <h2>{meal.name}</h2>
-      <Row>
-        <button onClick={() => vote(false)}>Nah</button>
-        <ImageWrapper thumbnail={meal.thumbnail} />
-        <button onClick={() => vote(true)}>Ya</button>
-      </Row>
+      <Container>
+        <BackButton />
+      </Container>
+      <Container primary>
+        <Row>
+          <VoteButton isAffirmative={false} voteFunction={vote} />
+
+          <ImageWrapper thumbnail={meal.thumbnail} />
+          <VoteButton isAffirmative={true} voteFunction={vote} />
+        </Row>
+        <BackgroundElement width={'100%'} height={'auto'} primary>
+          <Text>{meal.name}</Text>
+        </BackgroundElement>
+      </Container>
     </>
   );
 };

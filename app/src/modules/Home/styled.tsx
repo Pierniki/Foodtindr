@@ -51,7 +51,7 @@ export const Input = styled.input`
   max-width: 150px;
   border-radius: 10px;
   border: 0;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 700;
   padding: 10px 20px;
 `;
@@ -72,21 +72,7 @@ export const CardTitle = styled.h4<CardTitleProps>`
 
 export const CardDescription = styled.p`
   color: var(--secondary);
-  margin: 0;
+  margin: 0 0 100px 0;
   font-weight: 700;
   font-size: 30px;
-`;
-
-export const Button = styled.button<ColorProps>`
-  margin-top: 100px;
-  cursor: pointer;
-  font-size: 30px;
-  font-weight: 700;
-  width: 200px;
-  padding: 10px;
-  box-sizing: border-box;
-  border: 0;
-  background-color: ${(props) =>
-    props.primary ? 'var(--primary)' : 'var(--primary-dark)'};
-  color: ${(props) => (props.primary ? 'var(--primary)' : 'var(--secondary)')};
 `;

@@ -15,3 +15,7 @@ export interface SizeProps {
 export interface RoomIdParams {
   id: string;
 }
+
+export interface FontProps {
+  fontSize?: string;
+}
