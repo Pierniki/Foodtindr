@@ -10,6 +10,11 @@ class Redis {
     if (!resultString) throw Error(`Key ${key} has no value.`);
     return JSON.parse(resultString);
   };
+  public static isPresent = async (key: string) => {
+    const resultString = await Redis.asyncGet(key);
+    if (resultString) return true;
+    return false;
+  };
 }
 
 export default Redis;

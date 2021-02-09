@@ -63,20 +63,43 @@ export const fetchDBMealData = async () => {
   }
 };
 
+export const fetchMealDetails = async (id: string) => {
+  try {
+    const cacheKey = id + '_details';
+    const data = await getCachedData(cacheKey);
+    if (data) return data;
+    const URI = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
+
+    const response = await fetch(URI);
+    const mealDetails = await response.json();
+
+    Redis.client.setex(cacheKey, 86400, JSON.stringify(mealDetails));
+
+    return mealDetails.meals[0];
+  } catch (err) {
+    Promise.reject(err);
+  }
+};
+
 export const fetchByCategory = async (
   category: string
 ): Promise<MealResponse> => {
-  if (!allCategories.includes(category)) return Promise.reject();
+  try {
+    if (!allCategories.includes(category)) return Promise.reject();
 
-  const data = await getCachedData(category);
-  if (data) return data;
+    const data = await getCachedData(category);
+    if (data) return data;
 
-  const URI = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`;
+    const URI = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`;
 
-  const response = await fetch(URI);
-  const meals = await response.json();
+    const response = await fetch(URI);
+    const meals = await response.json();
 
-  Redis.client.setex(category, 86400, JSON.stringify(meals));
+    Redis.client.setex(category, 86400, JSON.stringify(meals));
 
-  return meals;
+    return meals;
+  } catch (err) {
+    console.log(err);
+    return Promise.reject(err);
+  }
 };
