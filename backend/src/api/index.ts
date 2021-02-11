@@ -1,14 +1,13 @@
 import fetch from 'node-fetch';
 import Redis from '../redis';
+import { Meal, MealDetails } from '../types';
 
 interface MealResponse {
   meals: Meal[];
 }
 
-export interface Meal {
-  strMeal: string;
-  strMealThumb: string;
-  idMeal: string;
+interface MealDetailsResponse {
+  meals: MealDetails[];
 }
 
 const allCategories = [
@@ -71,11 +70,21 @@ export const fetchMealDetails = async (id: string) => {
     const URI = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
 
     const response = await fetch(URI);
-    const mealDetails = await response.json();
+    const mealDetails = (await response.json()).meals[0];
+
+    const parsedIngredients = Array.from(Array(20).keys())
+      .map((i) => {
+        const ingredient = mealDetails[`strIngredient${i + 1}`];
+        const measure = mealDetails[`strMeasure${i + 1}`];
+        console.log(!ingredient, !measure);
+        if (!ingredient || !measure) return;
+        return `${measure} ${ingredient}`;
+      })
+      .filter((value) => value);
 
     Redis.client.setex(cacheKey, 86400, JSON.stringify(mealDetails));
 
-    return mealDetails.meals[0];
+    return mealDetails;
   } catch (err) {
     Promise.reject(err);
   }

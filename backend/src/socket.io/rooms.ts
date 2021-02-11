@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid';
 import { Server, Socket } from 'socket.io';
-import { fetchMealDetails, Meal } from '../api';
+import { fetchMealDetails } from '../api';
 import Redis from '../redis';
+import { Meal, MealDetails } from '../types';
 import { shuffle } from '../util';
 
 const registerRoomHandlers = (io: Server, socket: Socket) => {
@@ -74,7 +75,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
 
     Redis.client.setex(roomId, 60 * 60, JSON.stringify(roomToDb));
     if (isVoteAMatch) {
-      const mealDetails = await fetchMealDetails(
+      const mealDetails: MealDetails = await fetchMealDetails(
         roomFromDb.meals[voteList.length - 1]
       );
       console.log(mealDetails);
