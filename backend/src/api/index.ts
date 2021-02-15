@@ -71,6 +71,13 @@ export const fetchMealDetails = async (id: string) => {
 
     const response = await fetch(URI);
     const mealDetails = (await response.json()).meals[0];
+    const {
+      idMeal,
+      strMeal,
+      strInstructions,
+      strCategory,
+      strMealThumb,
+    } = mealDetails;
 
     const parsedIngredients = Array.from(Array(20).keys())
       .map((i) => {
@@ -78,13 +85,22 @@ export const fetchMealDetails = async (id: string) => {
         const measure = mealDetails[`strMeasure${i + 1}`];
         console.log(!ingredient, !measure);
         if (!ingredient || !measure) return;
-        return `${measure} ${ingredient}`;
+        return `${ingredient} ${measure}`;
       })
       .filter((value) => value);
 
-    Redis.client.setex(cacheKey, 86400, JSON.stringify(mealDetails));
+    const parsedMealDetails = {
+      idMeal,
+      strMeal,
+      strInstructions,
+      strCategory,
+      strMealThumb,
+      ingredients: parsedIngredients,
+    };
 
-    return mealDetails;
+    Redis.client.setex(cacheKey, 86400, JSON.stringify(parsedMealDetails));
+
+    return parsedMealDetails;
   } catch (err) {
     Promise.reject(err);
   }

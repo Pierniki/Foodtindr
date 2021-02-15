@@ -1,14 +1,16 @@
-import React, { FC, useEffect, useReducer, useRef, useState } from 'react';
+import React, { FC, useEffect, useReducer, useRef } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import BackButton from '../common/BackButton';
 import BackgroundElement from '../common/BackgroundElement';
 import Button from '../common/Button';
 import Container from '../common/Container';
+import ImageWrapper from '../common/ImageWrapper';
 import Text from '../common/Text';
+import Recipe from '../Recipe';
 import WaitingRoom from '../WaitingRoom';
 import roomReducer, { State } from './roomReducer';
-import { ImageReplacer, Row, ThumbnailImage } from './styled';
+import { Row } from './styled';
 
 interface RoomParams {
   id: string;
@@ -32,7 +34,10 @@ const RoomWrapper = () => {
   const { id } = useParams<RoomParams>();
   const history = useHistory();
   const socketCon = useRef<SocketIOClient.Socket>();
-  const [{ meal, roomState }, dispatch] = useReducer(roomReducer, initialState);
+  const [{ meal, mealDetails, roomState }, dispatch] = useReducer(
+    roomReducer,
+    initialState
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -69,27 +74,9 @@ const RoomWrapper = () => {
   if (roomState === 'loading') return null;
   if (roomState === 'waiting' || !meal || !socketCon.current)
     return <WaitingRoom />;
+  if (roomState === 'match' && mealDetails)
+    return <Recipe mealDetails={mealDetails} />;
   return <Room id={id} meal={meal} socket={socketCon.current} />;
-};
-
-interface ImageWrapperProps {
-  thumbnail: string;
-}
-
-const ImageWrapper: FC<ImageWrapperProps> = ({ thumbnail }) => {
-  const [isImgReady, setIsImgReady] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!thumbnail) return;
-    const img = new Image();
-    img.onload = () => {
-      setIsImgReady(true);
-    };
-    img.src = thumbnail;
-  }, [thumbnail]);
-
-  if (!isImgReady) return <ImageReplacer>...</ImageReplacer>;
-  return <ThumbnailImage src={thumbnail} alt="thumbnail" />;
 };
 
 interface VoteButtonProps {

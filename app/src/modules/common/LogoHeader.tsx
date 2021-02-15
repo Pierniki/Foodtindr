@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import BackgroundElement from './BackgroundElement';
 
@@ -38,9 +39,12 @@ const BackgroundContainer = () => {
 export const LogoHeader = () => {
   return (
     <>
-      <Title>
-        Food <TitleAccent>Tindr.</TitleAccent>
-      </Title>
+      <Link to={'/'} style={{ textDecoration: 'none' }}>
+        <Title>
+          Food <TitleAccent>Tindr.</TitleAccent>
+        </Title>
+      </Link>
+
       <BackgroundContainer />
     </>
   );
