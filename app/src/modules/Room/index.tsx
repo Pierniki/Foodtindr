@@ -1,16 +1,15 @@
-import React, { FC, useEffect, useReducer, useRef } from 'react';
+import React, { FC, useEffect, useReducer, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import BackButton from '../common/BackButton';
 import BackgroundElement from '../common/BackgroundElement';
 import Button from '../common/Button';
-import Container from '../common/Container';
 import ImageWrapper from '../common/ImageWrapper';
 import Text from '../common/Text';
 import Recipe from '../Recipe';
 import WaitingRoom from '../WaitingRoom';
 import roomReducer, { State } from './roomReducer';
-import { Row } from './styled';
+import { RoomContainer, Row, VotingButton } from './styled';
 
 interface RoomParams {
   id: string;
@@ -86,16 +85,9 @@ interface VoteButtonProps {
 
 const VoteButton: FC<VoteButtonProps> = ({ voteFunction, isAffirmative }) => {
   return (
-    <div>
-      <Button
-        width={'150px'}
-        height={'150px'}
-        primary
-        onClick={() => voteFunction(isAffirmative)}
-      >
-        {isAffirmative ? 'Yes' : 'No'}
-      </Button>
-    </div>
+    <VotingButton primary onClick={() => voteFunction(isAffirmative)}>
+      {isAffirmative ? 'Yes' : 'No'}
+    </VotingButton>
   );
 };
 
@@ -105,7 +97,13 @@ interface RoomProps {
   socket: SocketIOClient.Socket;
 }
 
-const Room: FC<RoomProps> = ({ id, meal, socket }) => {
+const Room: FC<RoomProps> = ({ meal, socket }) => {
+  const [animationsToggled, setAnimationsToggled] = useState<boolean>(true);
+
+  const toggleAnimations = () => {
+    setAnimationsToggled(!animationsToggled);
+  };
+
   const vote = (vote: boolean) => {
     socket.emit('room:vote', vote);
   };
@@ -113,19 +111,25 @@ const Room: FC<RoomProps> = ({ id, meal, socket }) => {
   if (!meal) return null;
   return (
     <>
-      <Container>
+      <Row>
         <BackButton />
-      </Container>
-      <Container primary>
+        <Button onClick={toggleAnimations} width={'140px'} fontSize={'25px'}>
+          toggle animations
+        </Button>
+      </Row>
+      <RoomContainer primary>
         <Row>
           <VoteButton isAffirmative={false} voteFunction={vote} />
-          <ImageWrapper thumbnail={meal.thumbnail} />
+          <ImageWrapper
+            thumbnail={meal.thumbnail}
+            animationsToggled={animationsToggled}
+          />
           <VoteButton isAffirmative={true} voteFunction={vote} />
         </Row>
         <BackgroundElement width={'100%'} height={'auto'} primary>
           <Text>{meal.name}</Text>
         </BackgroundElement>
-      </Container>
+      </RoomContainer>
     </>
   );
 };

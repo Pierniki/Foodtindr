@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { device } from '../../globalStyles';
 import { ColorProps, RelativityProps } from '../../types';
 
 export const Header = styled.header`
@@ -8,6 +9,9 @@ export const Header = styled.header`
   justify-content: center;
   align-items: center;
   margin-bottom: 130px;
+  @media (${device.tablet}) {
+    margin-bottom: 0;
+  }
 `;
 
 export const Subtitle = styled.h3`
@@ -22,8 +26,11 @@ export const SubtitleAccent = styled.span`
 
 export const Main = styled.main`
   display: flex;
-  flex-direction: row;
   justify-content: center;
+  flex-direction: row;
+  @media (${device.tablet}) {
+    flex-direction: column;
+  }
 `;
 
 export const Card = styled.div`
@@ -34,6 +41,9 @@ export const Card = styled.div`
   justify-content: flex-start;
   align-items: center;
   box-sizing: border-box;
+  @media (${device.tablet}) {
+    padding: 20px;
+  }
 `;
 
 export const InputButtonDiv = styled.div`
@@ -42,6 +52,9 @@ export const InputButtonDiv = styled.div`
   flex-direction: row;
   width: 200px;
   background-color: var(--primary);
+  @media (${device.tablet}) {
+    margin-top: 50px;
+  }
 `;
 
 export const Input = styled.input`
@@ -68,6 +81,13 @@ export const CardTitle = styled.h4<CardTitleProps>`
   font-size: 50px;
   color: ${(props) =>
     props.primary ? 'var(--primary)' : 'var(--primary-dark)'};
+  @media (${device.tablet}) {
+    padding: 10px;
+    position: static;
+    font-size: 45px;
+    text-align: left;
+    width: 100%;
+  }
 `;
 
 export const CardDescription = styled.p`
@@ -75,4 +95,10 @@ export const CardDescription = styled.p`
   margin: 0 0 100px 0;
   font-weight: 700;
   font-size: 30px;
+  @media (${device.tablet}) {
+    text-align: left;
+    padding: 10px;
+    margin-bottom: 50px;
+    width: 100%;
+  }
 `;

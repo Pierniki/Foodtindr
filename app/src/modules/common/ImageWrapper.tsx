@@ -1,35 +1,114 @@
 import { FC, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { device } from '../../globalStyles';
 
-interface ImageWrapperProps {
-  thumbnail: string;
+const getRandomCoords = () => {
+  const max = Math.floor(70);
+  const min = Math.ceil(30);
+  const coords = `${Math.floor(Math.random() * (max - min)) + min}% ${
+    Math.floor(Math.random() * (max - min)) + min
+  }%`;
+  return coords;
+};
+
+const reveal = (coords: string) => keyframes`
+    from {
+      clip-path: circle(0% at ${coords});
+    }
+    to {
+      clip-path: circle(100% at ${coords});
+    }
+`;
+
+const shrink = (coords: string) => keyframes`
+    from {
+      clip-path: circle(100% at ${coords});
+    }
+    to {
+      clip-path: circle(0% at ${coords});
+    }
+`;
+
+interface ThumbnailImageProps {
+  animation: string;
+  coords: string;
 }
 
-export const ThumbnailImage = styled.img`
-  margin: 40px auto;
+export const ThumbnailImage = styled.img<ThumbnailImageProps>`
+  padding: 40px 0;
+  position: relative;
   max-width: 500px;
+  animation: ${(props) =>
+      props.animation === 'shrink'
+        ? shrink(props.coords)
+        : reveal(props.coords)}
+    0.5s ease-out;
+
+  @media (${device.tablet}) {
+    margin: 0;
+    width: 100%;
+    height: auto;
+    background-size: cover;
+  }
 `;
 
 export const ImageReplacer = styled.div`
-  margin: 40px auto;
+  padding: 40px 0;
   min-width: 500px;
   min-height: 500px;
 `;
 
-const ImageWrapper: FC<ImageWrapperProps> = ({ thumbnail }) => {
+interface ImageWrapperProps {
+  thumbnail: string;
+  animationsToggled?: boolean;
+}
+
+const ImageWrapper: FC<ImageWrapperProps> = ({
+  thumbnail,
+  animationsToggled,
+}) => {
   const [isImgReady, setIsImgReady] = useState<boolean>(false);
+  const [currentThumbnail, setCurrentThumbnail] = useState<string>();
+  const [animation, setAnimation] = useState<string>('reveal');
+  const [coords, setCoords] = useState<string>('50% 50%');
 
   useEffect(() => {
     if (!thumbnail) return;
     const img = new Image();
-    img.onload = () => {
-      setIsImgReady(true);
-    };
     img.src = thumbnail;
+
+    img.onload = () => {
+      if (!animationsToggled) return setCurrentThumbnail(thumbnail);
+      setCoords(getRandomCoords());
+      setAnimation('shrink');
+
+      setTimeout(() => {
+        setIsImgReady(false);
+      }, 400);
+      setTimeout(() => {
+        setCurrentThumbnail(thumbnail);
+        setIsImgReady(true);
+        setCoords(getRandomCoords());
+
+        setAnimation('reveal');
+      }, 700);
+    };
   }, [thumbnail]);
 
-  if (!isImgReady) return <ImageReplacer>...</ImageReplacer>;
-  return <ThumbnailImage src={thumbnail} alt="thumbnail" />;
+  return (
+    <>
+      {isImgReady ? (
+        <ThumbnailImage
+          animation={animation}
+          coords={coords}
+          src={currentThumbnail}
+          alt="thumbnail"
+        />
+      ) : (
+        <ImageReplacer />
+      )}
+    </>
+  );
 };
 
 export default ImageWrapper;

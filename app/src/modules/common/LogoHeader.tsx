@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { device } from '../../globalStyles';
 import BackgroundElement from './BackgroundElement';
 
 const Title = styled.h1`
@@ -10,6 +11,10 @@ const Title = styled.h1`
   font-size: 100px;
   font-weight: 900;
   margin-bottom: 0;
+  @media (${device.tablet}) {
+    margin-bottom: 30px;
+    font-size: 60px;
+  }
 `;
 
 const TitleAccent = styled.span`
