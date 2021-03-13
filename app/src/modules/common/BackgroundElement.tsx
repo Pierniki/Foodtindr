@@ -18,6 +18,8 @@ const BackgroundElement = styled.div<BackgroundElementProps>`
     width: 100%;
     height: auto;
   }
+  border-radius: 2px;
+
   background-color: ${(props) =>
     props.primary ? 'var(--primary)' : 'var(--primary-dark)'};
 `;

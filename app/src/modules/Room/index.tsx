@@ -3,13 +3,13 @@ import { useHistory, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import BackButton from '../common/BackButton';
 import BackgroundElement from '../common/BackgroundElement';
-import Button from '../common/Button';
 import ImageWrapper from '../common/ImageWrapper';
 import Text from '../common/Text';
+import Toggler from '../common/Toggler';
 import Recipe from '../Recipe';
 import WaitingRoom from '../WaitingRoom';
 import roomReducer, { State } from './roomReducer';
-import { RoomContainer, Row, VotingButton } from './styled';
+import { NavRow, RoomContainer, Row, VotingButton } from './styled';
 
 interface RoomParams {
   id: string;
@@ -100,10 +100,6 @@ interface RoomProps {
 const Room: FC<RoomProps> = ({ meal, socket }) => {
   const [animationsToggled, setAnimationsToggled] = useState<boolean>(true);
 
-  const toggleAnimations = () => {
-    setAnimationsToggled(!animationsToggled);
-  };
-
   const vote = (vote: boolean) => {
     socket.emit('room:vote', vote);
   };
@@ -111,12 +107,10 @@ const Room: FC<RoomProps> = ({ meal, socket }) => {
   if (!meal) return null;
   return (
     <>
-      <Row>
+      <NavRow>
         <BackButton />
-        <Button onClick={toggleAnimations} width={'140px'} fontSize={'25px'}>
-          toggle animations
-        </Button>
-      </Row>
+        <Toggler state={animationsToggled} setState={setAnimationsToggled} />
+      </NavRow>
       <RoomContainer primary>
         <Row>
           <VoteButton isAffirmative={false} voteFunction={vote} />

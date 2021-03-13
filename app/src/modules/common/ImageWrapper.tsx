@@ -55,7 +55,12 @@ export const ThumbnailImage = styled.img<ThumbnailImageProps>`
 export const ImageReplacer = styled.div`
   padding: 40px 0;
   min-width: 500px;
-  min-height: 500px;
+  height: 500px;
+
+  @media (${device.tablet}) {
+    margin: 0;
+    width: 100%;
+  }
 `;
 
 interface ImageWrapperProps {
@@ -93,6 +98,8 @@ const ImageWrapper: FC<ImageWrapperProps> = ({
         setAnimation('reveal');
       }, 700);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thumbnail]);
 
   return (

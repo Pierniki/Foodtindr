@@ -8,7 +8,7 @@ export const Header = styled.header`
   text-align: center;
   justify-content: center;
   align-items: center;
-  margin-bottom: 130px;
+  margin-bottom: 100px;
   @media (${device.tablet}) {
     margin-bottom: 0;
   }
