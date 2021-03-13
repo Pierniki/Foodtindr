@@ -16,6 +16,7 @@ When both of you "like" the same meal you are presented with a recipe and list o
 
 ## General info
 Project is currently in an MVP state. You can read about planned functionalities in a [Features](#features) section.
+Live version coming soon.
 	
 ## Features
 #### Current:
