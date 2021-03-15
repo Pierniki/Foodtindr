@@ -6,7 +6,8 @@ const init = (io: Server) => {
     socket.leave(socket.id);
     registerRoomHandlers(io, socket);
     socket.on('disconnect', () => {
-      console.log('bye');
+      console.log('disconnect', socket.id);
+      console.log(io.sockets.adapter.rooms);
     });
   });
 };

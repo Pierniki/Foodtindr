@@ -2,65 +2,43 @@ import { nanoid } from 'nanoid';
 import { Server, Socket } from 'socket.io';
 import { fetchMealDetails } from '../api';
 import Redis from '../redis';
-import { Meal, MealDetails } from '../types';
+import { Meal, MealDetails, Room } from '../types';
 import { shuffle } from '../util';
 
 const registerRoomHandlers = (io: Server, socket: Socket) => {
   socket.on('room:create', async () => {
     const roomId = nanoid(6);
     await socket.join(roomId);
-    console.log(`${socket.id} JOINED A ROOM WITH ID: ${roomId}`);
+    console.log('room:create', socket.id);
+
+    console.log(socket.rooms);
+
     socket.emit('room:joined', roomId);
   });
 
   socket.on('room:join', async (roomId: string) => {
-    const roomsMap = io.sockets.adapter.rooms;
-    const room = roomsMap.get(roomId);
-    const isJoinable = roomsMap.get(roomId)?.size === 1;
+    console.log('room:join', socket.id);
+
+    const room = io.sockets.adapter.rooms.get(roomId);
+    const isJoinable = room && room.size === 1;
 
     if (!room || !isJoinable) return socket.emit('room:missing');
 
     const roomFromDbString = await Redis.asyncGet(roomId);
-
-    // TODO REFACTOR
-    if (roomFromDbString) {
-      const roomFromDb = JSON.parse(roomFromDbString);
-      const [_, id1, id2] = Object.keys(roomFromDb);
-      const activeId = Array.from(room)[0];
-      const oldId = activeId === id1 ? id2 : id1;
-
-      const roomToDb = {
-        meals: roomFromDb.meals,
-        [activeId]: roomFromDb[activeId],
-        [socket.id]: roomFromDb[oldId],
-      };
-
-      await socket.join(roomId);
-
-      Redis.client.setex(roomId, 60 * 60, JSON.stringify(roomToDb));
-      const lastMealId = roomToDb.meals[roomToDb[socket.id].length];
-      const lastMeal = await Redis.get(lastMealId);
-
-      return socket.emit('room:meals', lastMeal);
-    }
+    const isRejoin = Boolean(roomFromDbString);
 
     await socket.join(roomId);
+    if (!isRejoin) socket.emit('room:joined', roomId);
 
-    const userIds = Array.from(room);
+    const roomToDb = isRejoin
+      ? getUpdatedRoom(roomFromDbString as string, room, socket.id)
+      : await getNewRoom(room);
 
-    console.log(`${socket.id} JOINED A ROOM WITH ID: ${roomId}`);
-    socket.emit('room:joined', roomId);
-
-    // TODO Let users choose categories
-    const randomMealIds = await getRandomMeals();
-    const roomToDb = {
-      meals: randomMealIds,
-      [userIds[0]]: [],
-      [userIds[1]]: [],
-    };
     Redis.client.setex(roomId, 60 * 60, JSON.stringify(roomToDb));
-    const meal: Meal = await Redis.get(randomMealIds[0]);
-    io.in(roomId).emit('room:meals', meal);
+
+    const meal: Meal = await getMealToSend(roomToDb, socket);
+    const target = isRejoin ? socket : io.in(roomId);
+    target.emit('room:meals', meal);
   });
 
   socket.on('room:vote', async (vote: boolean) => {
@@ -78,7 +56,6 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
       const mealDetails: MealDetails = await fetchMealDetails(
         roomFromDb.meals[voteList.length - 1]
       );
-      console.log(mealDetails);
       return io.in(roomId).emit('room:match', mealDetails);
     }
 
@@ -90,6 +67,41 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
 const isMatch = (roomToDb: any, voteIdx: number) => {
   const [_, id1, id2] = Object.keys(roomToDb);
   return roomToDb[id1][voteIdx] && roomToDb[id2][voteIdx];
+};
+
+const getUpdatedRoom = (
+  roomFromDbString: string,
+  room: Set<string>,
+  socketId: string
+): Room => {
+  const roomFromDb = JSON.parse(roomFromDbString);
+  const [_, id1, id2] = Object.keys(roomFromDb);
+  const activeId = Array.from(room)[0];
+  const oldId = activeId === id1 ? id2 : id1;
+
+  return {
+    meals: roomFromDb.meals,
+    [activeId]: roomFromDb[activeId],
+    [socketId]: roomFromDb[oldId],
+  };
+};
+
+const getNewRoom = async (room: Set<string>): Promise<Room> => {
+  const userIds = Array.from(room);
+
+  const randomMealIds = await getRandomMeals();
+  return {
+    meals: randomMealIds,
+    [userIds[0]]: [],
+    [userIds[1]]: [],
+  };
+};
+
+const getMealToSend = async (roomToDb: Room, socket: Socket) => {
+  const lastMealId =
+    roomToDb.meals[roomToDb[socket.id] ? roomToDb[socket.id].length : 0];
+  const meal = await Redis.get(lastMealId);
+  return meal;
 };
 
 const getRandomMeals = async () => {
