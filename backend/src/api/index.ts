@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import Redis from '../redis';
 import { Meal, MealDetails } from '../types';
-import { shuffle } from '../util';
+import shuffle from '../util/shuffle';
 
 interface MealResponse {
   meals: Meal[];

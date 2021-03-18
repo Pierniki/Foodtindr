@@ -38,6 +38,12 @@ const RoomWrapper = () => {
     initialState
   );
 
+  const onStart = () => {
+    const socket = socketCon.current;
+    if (!socket) return;
+    socket.emit('room:start');
+  };
+
   useEffect(() => {
     if (!id) return;
     socketCon.current = io(SOCKET_URL);
@@ -68,13 +74,12 @@ const RoomWrapper = () => {
     return () => {
       socket.disconnect();
     };
-    // REVIEW
     // eslint-disable-next-line
   }, []);
 
   if (roomState === 'loading') return null;
   if (roomState === 'waiting' || !meal || !socketCon.current)
-    return <WaitingRoom />;
+    return <WaitingRoom onStart={onStart} />;
   if (roomState === 'match' && mealDetails)
     return <Recipe mealDetails={mealDetails} />;
   return <Room id={id} meal={meal} socket={socketCon.current} />;

@@ -1,8 +1,11 @@
+import { replacer, reviver } from '../../util/jsonHelper';
+
 interface RoomConstructorProps {
   id: string;
   maxUsers: number;
   mealIds: string[];
   userIds: Set<string>;
+  userVotes?: Map<string, boolean[]>;
 }
 
 class Room {
@@ -12,12 +15,18 @@ class Room {
   private userIds: Set<string>;
   private userVotes: Map<string, boolean[]>;
 
-  constructor({ id, maxUsers = 2, mealIds, userIds }: RoomConstructorProps) {
+  constructor({
+    id,
+    maxUsers = 2,
+    mealIds,
+    userIds,
+    userVotes,
+  }: RoomConstructorProps) {
     this.id = id;
     this.maxUsers = maxUsers;
     this.mealIds = mealIds;
     this.userIds = userIds;
-    this.userVotes = new Map();
+    this.userVotes = userVotes ? userVotes : new Map();
   }
 
   public getId() {
@@ -73,7 +82,11 @@ class Room {
   }
 
   public toString() {
-    return JSON.stringify(this);
+    console.log(this.userIds, this.userVotes);
+    const str = JSON.stringify(this, replacer);
+    const tst = new Room(JSON.parse(str, reviver));
+    console.log(tst.userIds, tst.userVotes);
+    return JSON.stringify(this, replacer);
   }
 }
 

@@ -32,11 +32,18 @@ const CopyCode = () => {
   );
 };
 
-const WaitingRoom = () => {
+interface WaitingRoomProps {
+  onStart: () => void;
+}
+
+const WaitingRoom: React.FC<WaitingRoomProps> = ({ onStart }) => {
   return (
     <Container>
       <HelperText>Send that code to your friend.</HelperText>
       <CopyCode />
+      <Button width="200px" onClick={onStart}>
+        go!
+      </Button>
       <HelperText>or</HelperText>
       <BackButton />
     </Container>

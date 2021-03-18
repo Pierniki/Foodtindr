@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { getRandomMeals } from '../../api';
 import Redis from '../../redis';
+import { reviver } from '../../util/jsonHelper';
 import Room from './room';
 
 class RoomService {
@@ -9,7 +10,8 @@ class RoomService {
   public static async getRoomById(id: string): Promise<Room> {
     const roomFromDbString = await Redis.asyncGet(id);
     if (!roomFromDbString) return Promise.reject('No room with id: ' + id);
-    return JSON.parse(roomFromDbString);
+    console.log(JSON.parse(roomFromDbString, reviver));
+    return new Room(JSON.parse(roomFromDbString, reviver));
   }
 
   public static async initializeRoom(userId: string) {

@@ -12,6 +12,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
   socket.on('room:vote', (vote: boolean) => onVote(vote).catch(handleErrors));
 
   const handleErrors = (error: any) => {
+    console.log(error);
     socket.emit('room:error', error.toString());
   };
 
@@ -31,6 +32,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     if (!userIds) throw Error('Room missing');
     if (!isUserJoinable(socket)) throw Error('Unable to join, already joined.');
     const room = await RoomService.getRoomById(roomId);
+    console.log(room);
     room.join(socket.id);
     await RoomService.updateRoom(room);
     await socket.join(room.getId());
