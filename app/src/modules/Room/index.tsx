@@ -42,10 +42,12 @@ const RoomWrapper = () => {
     if (!id) return;
     socketCon.current = io(SOCKET_URL);
     const socket = socketCon.current;
-
     socket.on('connect', () => {
       if (id === 'new') return socket.emit('room:create');
       return socket.emit('room:join', id);
+    });
+    socket.on('room:error', (error: string) => {
+      console.log(error);
     });
     socket.on('room:joined', (id: string) => {
       dispatch({ type: 'SET_WAITING' });

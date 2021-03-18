@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import Redis from '../redis';
 import { Meal, MealDetails } from '../types';
+import { shuffle } from '../util';
 
 interface MealResponse {
   meals: Meal[];
@@ -127,4 +128,10 @@ export const fetchByCategory = async (
     console.log(err);
     return Promise.reject(err);
   }
+};
+
+export const getRandomMeals = async () => {
+  const mealIdsString = await Redis.get('mealIds');
+  const shuffledMealIds: string[] = shuffle(mealIdsString);
+  return shuffledMealIds;
 };

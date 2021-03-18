@@ -53,7 +53,14 @@ const CreateRoomCard = () => {
 };
 
 const InputButton = () => {
+  const [isFirstClick, setIsFirstClick] = useState(true);
   const [id, setId] = useState<string>('ABCDEF');
+
+  const onFirstClick = () => {
+    if (!isFirstClick) return;
+    setIsFirstClick(false);
+    setId('');
+  };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setId(e.target.value);
@@ -61,7 +68,7 @@ const InputButton = () => {
 
   return (
     <InputButtonDiv>
-      <Input value={id} onChange={onInputChange}></Input>
+      <Input value={id} onChange={onInputChange} onClick={onFirstClick}></Input>
       <Link to={`/room/${id}`}>
         <Button fontSize={'30px'} primary>
           {'>'}
