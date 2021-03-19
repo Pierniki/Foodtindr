@@ -1,7 +1,6 @@
 import { Server, Socket } from 'socket.io';
+import MealService from '../domain/meal/mealService';
 import RoomService from '../domain/room/roomService';
-import Redis from '../redis';
-import { Meal } from '../types';
 
 const registerRoomHandlers = (io: Server, socket: Socket) => {
   socket.on('room:create', () => onCreate().catch(handleErrors));
@@ -34,7 +33,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     const room = await RoomService.getRoomById(roomId);
     console.log(room);
     room.join(socket.id);
-    await RoomService.updateRoom(room);
+    RoomService.updateRoom(room);
     await socket.join(room.getId());
     io.in(room.getId()).emit('room:joined', room.getId());
   };
@@ -42,8 +41,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
   const onStart = async () => {
     const roomId = socket.rooms.keys().next().value;
     const room = await RoomService.getRoomById(roomId);
-    // TODO Meal service
-    const meal: Meal = await Redis.get(room.getFirstMealId());
+    const meal = await MealService.getMealById(room.getFirstMealId());
     return io.in(room.getId()).emit('room:meals', meal);
   };
 
@@ -51,12 +49,11 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     const roomId = socket.rooms.keys().next().value;
     const room = await RoomService.getRoomById(roomId);
     const voteIdx = room.vote(socket.id, vote);
-    await RoomService.updateRoom(room);
+    RoomService.updateRoom(room);
     if (room.isVoteMatch(voteIdx)) socket.emit('room:match', voteIdx);
     const nextMealId = room.getNextMealId(socket.id);
     if (!nextMealId) return socket.emit('room:end');
-    // TODO Meal service
-    const meal: Meal = await Redis.get(nextMealId);
+    const meal = await MealService.getMealDetails(nextMealId);
     return socket.emit('room:meals', meal);
   };
 };

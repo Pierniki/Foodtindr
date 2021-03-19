@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
-import { getRandomMeals } from '../../api';
 import Redis from '../../redis';
 import { reviver } from '../../util/jsonHelper';
+import MealService from '../meal/mealService';
 import Room from './room';
 
 class RoomService {
@@ -10,7 +10,6 @@ class RoomService {
   public static async getRoomById(id: string): Promise<Room> {
     const roomFromDbString = await Redis.asyncGet(id);
     if (!roomFromDbString) return Promise.reject('No room with id: ' + id);
-    console.log(JSON.parse(roomFromDbString, reviver));
     return new Room(JSON.parse(roomFromDbString, reviver));
   }
 
@@ -18,7 +17,7 @@ class RoomService {
     const room = new Room({
       id: nanoid(6),
       maxUsers: 2,
-      mealIds: await getRandomMeals(),
+      mealIds: await MealService.getRandomMeals(),
       userIds: new Set([userId]),
     });
     Redis.client.setex(
@@ -29,12 +28,16 @@ class RoomService {
     return room;
   }
 
-  public static async updateRoom(room: Room) {
-    Redis.client.setex(
+  public static updateRoom(room: Room) {
+    return Redis.client.setex(
       room.getId(),
       RoomService.redisExpiration,
       room.toString()
     );
+  }
+
+  public static deleteRoomById(id: string) {
+    return Redis.client.del(id);
   }
 }
 

@@ -1,4 +1,4 @@
-import { replacer, reviver } from '../../util/jsonHelper';
+import { replacer } from '../../util/jsonHelper';
 
 interface RoomConstructorProps {
   id: string;
@@ -82,10 +82,6 @@ class Room {
   }
 
   public toString() {
-    console.log(this.userIds, this.userVotes);
-    const str = JSON.stringify(this, replacer);
-    const tst = new Room(JSON.parse(str, reviver));
-    console.log(tst.userIds, tst.userVotes);
     return JSON.stringify(this, replacer);
   }
 }

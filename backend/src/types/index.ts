@@ -4,11 +4,6 @@ export interface Meal {
   idMeal: string;
 }
 
-export interface Room {
-  [x: string]: any;
-  meals: string[];
-}
-
 export interface MealDetails extends Meal {
   strDrinkAlternate?: null;
   strCategory: string;
