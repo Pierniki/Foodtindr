@@ -23,7 +23,11 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     const room = await RoomService.initializeRoom(socket.id);
     if (!isUserJoinable(socket)) throw Error('Unable to join, already joined.');
     await socket.join(room.getId());
-    return socket.emit('room:joined', room.getId());
+    return socket.emit(
+      'room:joined',
+      room.getId(),
+      Array.from(room.getUserIds())
+    );
   };
 
   const onJoin = async (roomId: string) => {
@@ -35,7 +39,11 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     room.join(socket.id);
     RoomService.updateRoom(room);
     await socket.join(room.getId());
-    io.in(room.getId()).emit('room:joined', room.getId());
+    io.in(room.getId()).emit(
+      'room:joined',
+      room.getId(),
+      Array.from(room.getUserIds())
+    );
   };
 
   const onStart = async () => {
@@ -46,6 +54,7 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
   };
 
   const onVote = async (vote: boolean) => {
+    console.log('vote');
     const roomId = socket.rooms.keys().next().value;
     const room = await RoomService.getRoomById(roomId);
     const voteIdx = room.vote(socket.id, vote);
@@ -53,7 +62,8 @@ const registerRoomHandlers = (io: Server, socket: Socket) => {
     if (room.isVoteMatch(voteIdx)) socket.emit('room:match', voteIdx);
     const nextMealId = room.getNextMealId(socket.id);
     if (!nextMealId) return socket.emit('room:end');
-    const meal = await MealService.getMealDetails(nextMealId);
+    const meal = await MealService.getMealById(nextMealId);
+    console.log(meal);
     return socket.emit('room:meals', meal);
   };
 };

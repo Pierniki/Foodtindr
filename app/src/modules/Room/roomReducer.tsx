@@ -7,16 +7,24 @@ type CommonAction = 'SET_LOADING' | 'SET_DONE' | 'SET_WAITING' | 'SET_MATCH';
 export interface State {
   meal: Meal | null;
   mealDetails: any;
+  users: string[];
   roomState: RoomState;
 }
 
 type Action =
   | { type: CommonAction }
   | { type: 'SET_MEAL'; meal: Meal }
-  | { type: 'SET_MEAL_DETAILS'; mealDetails: any };
+  | { type: 'SET_MEAL_DETAILS'; mealDetails: any }
+  | { type: 'ON_JOIN'; users: string[] };
 
 const roomReducer = (state: State, action: Action): State => {
   switch (action.type) {
+    case 'ON_JOIN':
+      return {
+        ...state,
+        users: action.users,
+        roomState: 'waiting',
+      };
     case 'SET_WAITING':
       return {
         ...state,
@@ -47,6 +55,7 @@ const roomReducer = (state: State, action: Action): State => {
         ...state,
         mealDetails: action.mealDetails,
       };
+
     default:
       return state;
   }

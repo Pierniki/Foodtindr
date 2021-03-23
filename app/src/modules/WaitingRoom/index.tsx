@@ -34,19 +34,38 @@ const CopyCode = () => {
 
 interface WaitingRoomProps {
   onStart: () => void;
+  users: string[];
 }
 
-const WaitingRoom: React.FC<WaitingRoomProps> = ({ onStart }) => {
+const WaitingRoom: React.FC<WaitingRoomProps> = ({ onStart, users }) => {
   return (
     <Container>
       <HelperText>Send that code to your friend.</HelperText>
       <CopyCode />
+      <UserList users={users} />
       <Button width="200px" onClick={onStart}>
         go!
       </Button>
       <HelperText>or</HelperText>
       <BackButton />
     </Container>
+  );
+};
+
+const UserList: React.FC<{ users: string[] }> = ({ users }) => {
+  return (
+    <table>
+      <tbody>
+        {users.map((user, idx) => {
+          return (
+            <tr key={'user_' + idx}>
+              <th>{user}</th>
+              <th>kick</th>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 };
 

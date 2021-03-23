@@ -26,6 +26,7 @@ const SOCKET_URL = 'ws://localhost:3000';
 const initialState: State = {
   meal: null,
   mealDetails: null,
+  users: [],
   roomState: 'loading',
 };
 
@@ -33,7 +34,7 @@ const RoomWrapper = () => {
   const { id } = useParams<RoomParams>();
   const history = useHistory();
   const socketCon = useRef<SocketIOClient.Socket>();
-  const [{ meal, mealDetails, roomState }, dispatch] = useReducer(
+  const [{ meal, mealDetails, roomState, users }, dispatch] = useReducer(
     roomReducer,
     initialState
   );
@@ -55,14 +56,12 @@ const RoomWrapper = () => {
     socket.on('room:error', (error: string) => {
       console.log(error);
     });
-    socket.on('room:joined', (id: string) => {
-      dispatch({ type: 'SET_WAITING' });
+    socket.on('room:joined', (id: string, userIds: string[]) => {
+      dispatch({ type: 'ON_JOIN', users: userIds });
       history.push(`/room/${id}`);
     });
-    socket.on('room:missing', () => {
-      history.push('/');
-    });
     socket.on('room:meals', (meal: Meal) => {
+      console.log(meal);
       if (roomState !== 'done') dispatch({ type: 'SET_DONE' });
       dispatch({ type: 'SET_MEAL', meal });
     });
@@ -79,7 +78,7 @@ const RoomWrapper = () => {
 
   if (roomState === 'loading') return null;
   if (roomState === 'waiting' || !meal || !socketCon.current)
-    return <WaitingRoom onStart={onStart} />;
+    return <WaitingRoom onStart={onStart} users={users} />;
   if (roomState === 'match' && mealDetails)
     return <Recipe mealDetails={mealDetails} />;
   return <Room id={id} meal={meal} socket={socketCon.current} />;

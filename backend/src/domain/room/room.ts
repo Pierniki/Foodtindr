@@ -5,6 +5,7 @@ interface RoomConstructorProps {
   maxUsers: number;
   mealIds: string[];
   userIds: Set<string>;
+  creator: string;
   userVotes?: Map<string, boolean[]>;
 }
 
@@ -13,6 +14,7 @@ class Room {
   private maxUsers: number;
   private mealIds: string[];
   private userIds: Set<string>;
+  private creator: string;
   private userVotes: Map<string, boolean[]>;
 
   constructor({
@@ -20,17 +22,23 @@ class Room {
     maxUsers = 2,
     mealIds,
     userIds,
+    creator,
     userVotes,
   }: RoomConstructorProps) {
     this.id = id;
     this.maxUsers = maxUsers;
     this.mealIds = mealIds;
     this.userIds = userIds;
+    this.creator = creator;
     this.userVotes = userVotes ? userVotes : new Map();
   }
 
   public getId() {
     return this.id;
+  }
+
+  public getUserIds() {
+    return this.userIds;
   }
 
   public getVotesByUser(userId: string) {
@@ -56,16 +64,16 @@ class Room {
   }
 
   public getNextMealId(userId: string) {
-    if (!this.userVotes.has(userId)) throw Error('User not part of the room');
+    if (!this.userIds.has(userId)) throw Error('User not part of the room');
     const userVotes = this.userVotes.get(userId)
       ? this.userVotes.get(userId)!
       : [];
     if (userVotes.length >= this.mealIds.length) return null;
-    return this.mealIds[userVotes.length - 1];
+    return this.mealIds[userVotes.length];
   }
 
   public vote(userId: string, vote: boolean) {
-    if (!this.userVotes.has(userId)) throw Error('User not part of the room');
+    if (!this.userIds.has(userId)) throw Error('User not part of the room');
     const userVotes = this.userVotes.get(userId)
       ? this.userVotes.get(userId)!
       : [];

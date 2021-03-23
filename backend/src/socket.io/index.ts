@@ -12,8 +12,8 @@ const init = (io: Server) => {
       console.log('disconnecting', socket.id);
       socket.rooms.forEach(async (roomId) => {
         await socket.leave(roomId);
-        if (!io.sockets.adapter.rooms.get(roomId))
-          RoomService.deleteRoomById(roomId);
+        if (!io.sockets.adapter.rooms.get(roomId)) console.log('deleting');
+        RoomService.deleteRoomById(roomId);
       });
     };
   });

@@ -18,6 +18,7 @@ class RoomService {
       id: nanoid(6),
       maxUsers: 2,
       mealIds: await MealService.getRandomMeals(),
+      creator: userId,
       userIds: new Set([userId]),
     });
     Redis.client.setex(

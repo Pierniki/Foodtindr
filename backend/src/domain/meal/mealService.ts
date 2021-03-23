@@ -1,7 +1,8 @@
+import fetch from 'node-fetch';
 import Redis from '../../redis';
-import { Meal } from '../../types';
 import { replacer, reviver } from '../../util/jsonHelper';
 import shuffle from '../../util/shuffle';
+import { Meal } from './meal';
 
 interface MealResponse {
   meals: Meal[];
@@ -51,9 +52,9 @@ class MealService {
 
   public static getRandomMeals = async () => {
     const data = await MealService.getFromCache('mealIds');
-    if (data) return data;
+    if (data) return shuffle(data as string[]);
     const mealIds = await MealService.fetchAllMeals();
-    const shuffledMealIds: string[] = shuffle(mealIds);
+    const shuffledMealIds = shuffle(mealIds);
     return shuffledMealIds;
   };
 
@@ -62,6 +63,10 @@ class MealService {
     const data = await MealService.getFromCache(cacheKey);
     if (data) return data;
 
+    console.log(
+      'fetching:',
+      `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+    );
     const URI = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
 
     // REVIEW
@@ -131,6 +136,10 @@ class MealService {
     const data: MealResponse = await MealService.getFromCache(category);
     if (data) return data;
 
+    console.log(
+      'fetching:',
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`
+    );
     const URI = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`;
 
     const response = await fetch(URI);
